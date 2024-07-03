@@ -1,30 +1,58 @@
-# React + TypeScript + Vite
+```markdown
+  # TicketsPRO
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+  TicketsPRO is a personal project aimed at managing tickets through a web application built with React, TypeScript, and Firebase. It provides user authentication, allowing users to sign in with email/password or Google account. The application includes features for ticket creation, status tracking, and password recovery via email. It emphasizes clean UI design and UX optimization for seamless ticket management.
 
-Currently, two official plugins are available:
+  ## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+  - **User Authentication**: Sign in with email/password or Google account.
+  - **Ticket Management**: Create, view, and track ticket statuses.
+  - **Password Recovery**: Reset passwords via email verification.
+  - **UI/UX**: Intuitive interface for easy navigation and usability.
 
-## Expanding the ESLint configuration
+  ## Technologies Used
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+  - React, TypeScript, SCSS, Firebase (Firestore, Authentication)
+  - Other Tools: React Router, React Hook Form, Firebase SDK
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Getting Started
+
+1. **Clone the repository:**
+
+   ```git
+   git clone https://github.com/DiegoXavier-hub/chamados.git
+   cd ticketspro
+   ```
+
+2. **Install dependencies:**
+
+   ```git
+   npm install
+   ```
+
+3. **Set up Firebase:**
+   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+   - Add your Firebase configuration details in `src/services/firebaseConnection.ts`
+   - Enable Email/Password and Google authentication methods
+   - Set up Firestore database rules
+
+4. **Run the application:**
+
+   ```node
+   npm start
+   ```
+
+5. **Open in your browser:**
+
+   ```node
+   http://localhost:3000
+   ```
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues and pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
