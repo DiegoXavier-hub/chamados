@@ -22,7 +22,8 @@ function AppContent(){
   const [showHeader, setShowHeader] = useState<boolean>(false);
 
   useEffect(()=>{
-    if(location.pathname === '/signIn' || location.pathname === '/signUp'){
+    const local = location.pathname;
+    if(local!=='/' && local!=='/customers' && local!=='/profile'){
       setShowHeader(false);
     }else{
       setShowHeader(true);

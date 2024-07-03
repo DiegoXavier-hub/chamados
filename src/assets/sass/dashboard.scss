@@ -1,0 +1,6 @@
+@import '_mixin.scss';
+@import '_colors.scss';
+
+#Dashboard{
+    @include flexBox(column, flex-start, start);
+}

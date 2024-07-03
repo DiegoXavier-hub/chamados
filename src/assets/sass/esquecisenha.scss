@@ -1,0 +1,91 @@
+@import '_mixin.scss';
+@import '_colors.scss';
+@import '_fonts.scss';
+
+#RecoverPassword{
+    @include flexBox(column, center, center);
+    font-family: "AirbnbCereal_W_Bk";
+    width: 100%;
+    height: 100vh;
+    font-size: 1.6rem;
+    background-color: $full-color;
+    color: darken($third-color, 10%);
+    
+    .content{
+        @include flexBox(column, space-evenly, center);
+        width: 90%;
+        max-width: 600px;
+        height: 500px;
+        background-color: #ffffff;
+        border-radius: 25px;
+        -webkit-box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 12px 0px, rgba(0, 0, 0, 0.05) 0px 24px 32px 0px;
+                box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 12px 0px, rgba(0, 0, 0, 0.05) 0px 24px 32px 0px;
+        padding: 30px 40px;
+
+        form{
+            @include flexBox(column, space-evenly, center);
+            height: 80%;
+            width: 80%;
+
+            label{
+                width: 100%;
+                font-size: 1.5rem;
+
+                input{
+                    @include flexBox(column, center, center);
+                    padding-left: 10px;
+                    font-size: 1.5rem;
+                    background-color: transparent;
+                    height: 50px;
+                    width: 100%;
+                    border-radius: 15px;
+                    border: 1px solid rgb(113, 113, 113);
+                    position: relative;
+                    margin-top: 5px;
+    
+                    &:focus{
+                        outline: 1px solid rgb(69, 69, 69);
+                    }
+    
+                    &::-webkit-input-placeholder{
+                        font-size: 1.5rem;
+                    }
+    
+                    &::-moz-placeholder{
+                        font-size: 1.5rem;
+                    }
+    
+                    &:-ms-input-placeholder{
+                        font-size: 1.5rem;
+                    }
+    
+                    &::-ms-input-placeholder{
+                        font-size: 1.5rem;
+                    }
+    
+                    &::placeholder{
+                        font-size: 1.5rem;
+                    }
+    
+                    &:nth-child(5), &:nth-child(4){
+                        width: 100%;
+                    }
+                }
+            }
+
+            .sign-message-content{
+                color: $text-color;
+                margin: 10px 0 10px 0;
+                font-size: 1.4rem;
+            }
+
+            h1{
+                color: darken($third-color, 10%);
+                font-weight:  500;
+                text-align: left;
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    }
+}

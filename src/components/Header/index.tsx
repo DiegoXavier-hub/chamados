@@ -4,6 +4,7 @@ import { FiHome, FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
 
 import { AuthContext } from '../../contexts/auth';
 import avatar from '../../assets/images/avatar.jpg';
+import '../../assets/sass/header.css'
 
 export default function Header() {
 
@@ -34,7 +35,7 @@ export default function Header() {
                     alt='User' />
             </div>
 
-            <Link to='/dashboard' className='link'>
+            <Link to='/' className='link'>
                 <FiHome size={22} color='#fff' />
                 Chamados
             </Link>

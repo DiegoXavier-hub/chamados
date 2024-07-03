@@ -1,0 +1,6 @@
+@import '_mixin.scss';
+@import '_colors.scss';
+
+#Profile{
+    @include flexBox(column, flex-start, start);
+} 

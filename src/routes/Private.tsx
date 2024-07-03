@@ -14,16 +14,12 @@ export default function Private({ children }: AuthProviderProps) {
     useEffect(() => {
         if (!signed && (location.pathname === '/signin')) {
             navigate('/signin');
-            console.log('oi')
         } else if (!signed && (location.pathname === '/signup')) {
             navigate('/signup');
-            console.log('ola')
         } else if (!signed && location.pathname === '/') {
             navigate('/signin');
-            console.log('oii')
         } else if (signed && (location.pathname === '/signin' || location.pathname === '/signup')) {
             navigate('/');
-            console.log('olaa')
         }
     }, [signed, navigate, location.pathname]);
 

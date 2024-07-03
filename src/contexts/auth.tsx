@@ -1,13 +1,13 @@
 import { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
 import { auth, db } from '../services/firebaseConnection';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 interface User {
     uid?: string;
-    name: string;
+    name?: string;
     email: string;
     avatarUrl?: string | null;
     expirationTime?: string;
@@ -22,6 +22,10 @@ interface AuthContextType {
     logOut: (expired: boolean) => Promise<void>;
     signIn: (user: User) => Promise<void>;
     signUp: (user: User) => Promise<void>;
+    recoverPassword: (user: User) => Promise<void>;
+    signUpGoogle: () => Promise<void>;
+    emailauth: string;
+    setEmailauth: (value: string) => void;
 }
 
 interface AuthProviderProps {
@@ -32,10 +36,14 @@ export const AuthContext = createContext<AuthContextType>({
     signed: false,
     user: null,
     loadingAuth: false,
-    setLoadingAuth: () => {},
-    logOut: async () => {},
-    signIn: async () => {},
-    signUp: async () => {}
+    setLoadingAuth: () => { },
+    logOut: async () => { },
+    signIn: async () => { },
+    signUp: async () => { },
+    recoverPassword: async () => { },
+    signUpGoogle: async () => { },
+    emailauth: '',
+    setEmailauth: () => { },
 });
 
 export default function AuthProvider({ children }: AuthProviderProps) {
@@ -43,6 +51,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
     const [loadingAuth, setLoadingAuth] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true); // new state to handle the initial loading
+    const provider = new GoogleAuthProvider()
+    const [emailauth, setEmailauth] = useState<string>('')
 
     function storageUser(user: User) {
         const expirationTime = new Date().getTime() + 1 * 24 * 60 * 60 * 1000; // 1 dia em milissegundos
@@ -56,12 +66,17 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         toast.success(`Bem-vindo(a), ${user.name}!`);
     }
 
-    async function signIn(user: User) {
+    async function signIn(user: Pick<User, 'email' | 'password'>) {
         setLoadingAuth(true);
         try {
             if (user && user.email && user.password) {
                 await signInWithEmailAndPassword(auth, user.email, user.password)
                     .then(async (value) => {
+                        if (!value.user.emailVerified) {
+                            toast.error("Please verify your email before logging in.");
+                            return;
+                        }
+
                         const uid = value.user.uid;
                         const docRef = doc(db, 'users', uid);
                         const docSnap = await getDoc(docRef);
@@ -69,13 +84,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
                         const data: User = {
                             uid: uid,
                             name: docSnap.data()?.name,
-                            email: value.user.email ? value.user.email : 'erro ao recuperar email sign in',
+                            email: value.user.email ? value.user.email : 'error recovering email sign in',
                             avatarUrl: docSnap.data()?.avatarUrl,
                         };
 
                         storageUser(data);
-                        setLoadingAuth(false);
-                        navigate('/dashboard');
+
+                        navigate('/');
                     })
                     .catch((error) => {
                         switch (error.code) {
@@ -89,7 +104,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
                                 toast.error('Ops, something went wrong, try again later!');
                                 break;
                         }
-                        setLoadingAuth(false);
+
                     });
             } else {
                 throw new Error('object user is necessary to sign in');
@@ -97,15 +112,15 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         }
         catch (error) {
             console.log(error);
+        } finally {
+            setLoadingAuth(false);
         }
     }
 
     async function signUp(user: User) {
         setLoadingAuth(true);
-
         try {
             if (user && user.email && user.password) {
-
                 await createUserWithEmailAndPassword(auth, user.email, user.password)
 
                     .then(async (value) => {
@@ -116,21 +131,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
                             avatarUrl: null,
                         })
                             .then(() => {
-                                const data: User = {
-                                    uid: uid,
-                                    name: user.name,
-                                    email: value.user.email ? value.user.email : 'erro ao recuperar email sign up',
-                                    avatarUrl: null,
-                                };
-
-                                setLoadingAuth(false);
-                                storageUser(data);
-                                navigate('/dashboard');
+                                navigate('/signin');
                             })
                             .catch((error) => {
                                 console.log(error);
-                                setLoadingAuth(false);
                             });
+
+                        await sendEmailVerification(value.user);
                     })
                     .catch((error) => {
                         let emailElement;
@@ -160,18 +167,64 @@ export default function AuthProvider({ children }: AuthProviderProps) {
                                 toast.error('Ops, something went wrong, try again later!');
                                 break;
                         }
-                    });                    
+                    });
             } else {
                 throw new Error('object user is necessary to sign up');
             }
         }
         catch (error) {
             console.log(error);
+        } finally {
+            setLoadingAuth(false);
+            }
         }
+
+    async function signUpGoogle() {
+        setLoadingAuth(true);
+        await signInWithPopup(auth, provider)
+            .then(async (value) => {
+
+                if (value.user.displayName !== null) {
+
+                    const [nome] = value.user.displayName.split(' ');
+
+
+
+                    const uid = value.user.uid;
+                    await setDoc(doc(db, 'users', uid), {
+                        name: nome,
+                        avatarUrl: value.user.photoURL,
+                    })
+                        .then(() => {
+                            const data: User = {
+                                uid: uid,
+                                name: nome,
+                                email: value.user.email ? value.user.email : 'error recovering email sign up google',
+                                avatarUrl: value.user.photoURL,
+                            }
+
+                            storageUser(data);
+
+                            navigate('/');
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        })
+                }
+
+            })
+            .catch((error) => {
+                toast.error('Something went wrong, try again later');
+                console.log(error);
+
+            })
+            .finally(() => {
+                setLoadingAuth(false);
+            });
     }
 
-
     const logOut = useCallback(async (expired: boolean) => {
+        setLoadingAuth(true);
         await signOut(auth)
             .then(() => {
                 localStorage.removeItem('@ticketsPRO');
@@ -181,8 +234,34 @@ export default function AuthProvider({ children }: AuthProviderProps) {
             })
             .catch((error) => {
                 console.log(error.code);
+            })
+            .finally(() => {
+                setLoadingAuth(false);
             });
     }, [navigate]);
+
+    async function recoverPassword(user: Pick<User, 'email'>) {
+        setLoadingAuth(true);
+        try {
+            if (!user.email) {
+                toast.error('Email is required');
+            }
+            await sendPasswordResetEmail(auth, user.email)
+                .then(() => {
+                    toast.success('Password recovery email sent successfully!');
+                    navigate('/signin');
+                })
+                .catch((error) => {
+                    toast.info('Failed to recover password: ' + error);
+                });
+    
+        } catch (error) {
+            toast.error('Failed to recover password: ' + error);
+        } finally {
+            setLoadingAuth(false);
+        }
+    }
+    
 
     useEffect(() => {
         async function loadStorageData() {
@@ -216,6 +295,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
                 logOut,
                 signIn,
                 signUp,
+                recoverPassword,
+                signUpGoogle,
+                emailauth,
+                setEmailauth,
             }}
         >
             {!loading && children}

@@ -1,0 +1,45 @@
+@import '_fonts.scss';
+@import './_colors.scss';
+
+.genericbutton{
+    width: 90%;
+    max-width: 400px;
+    height: 50px;
+    font-size: 1.6rem;
+    border: none;
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+    padding-left: 10px;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    -webkit-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+
+    &:hover{
+        background-color: lighten($color: $third-color, $amount: 5);
+        font-size: 1.8rem;
+
+        svg{
+            width: 60px !important;
+        }
+    }
+}
+
+.genericbuttonnormal{
+    background-color: $third-color;
+}
+
+.genericbuttonwhite {
+    background-color: #fff;
+}
